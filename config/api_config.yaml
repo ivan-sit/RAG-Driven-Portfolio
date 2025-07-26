@@ -1,0 +1,62 @@
+# API Configuration
+api:
+  # Server Settings
+  server:
+    host: "0.0.0.0"
+    port: 8000
+    debug: false
+    log_level: "info"
+  
+  # CORS Settings
+  cors:
+    allow_origins: ["*"]
+    allow_credentials: true
+    allow_methods: ["*"]
+    allow_headers: ["*"]
+  
+  # Data Sources
+  data_sources:
+    newsapi:
+      enabled: true
+      base_url: "https://newsapi.org/v2"
+      page_size: 50
+      language: "en"
+      sort_by: "publishedAt"
+    
+    rss_feeds:
+      enabled: true
+      feeds:
+        - name: "Reuters Business"
+          url: "https://feeds.reuters.com/reuters/businessNews"
+          max_articles: 20
+        - name: "CNBC"
+          url: "https://feeds.cnbc.com/100003114-1.xml"
+          max_articles: 20
+        - name: "Bloomberg Markets"
+          url: "https://feeds.bloomberg.com/markets/news.rss"
+          max_articles: 20
+    
+    financial_apis:
+      alpha_vantage:
+        enabled: true
+        base_url: "https://www.alphavantage.co/query"
+      
+      finnhub:
+        enabled: true
+        base_url: "https://finnhub.io/api/v1"
+      
+      yahoo_finance:
+        enabled: true
+  
+  # Search Settings
+  search:
+    default_top_k: 10
+    max_top_k: 50
+    recent_hours: 24
+  
+  # Response Settings
+  response:
+    max_summary_length: 300
+    max_reason_length: 500
+    include_sources: true
+    include_timestamps: true 

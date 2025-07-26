@@ -1,0 +1,64 @@
+# RAG Pipeline Configuration
+rag:
+  # Text Processing
+  chunk_size: 1000
+  chunk_overlap: 200
+  
+  # LLM Settings
+  max_tokens: 300
+  temperature: 0.7
+  model: "gpt-4-turbo-preview"
+  
+  # Retrieval Settings
+  retrieval_top_k: 10
+  max_history_size: 6
+  
+  # Scheduling (in minutes)
+  data_ingestion_interval: 60
+  summarization_interval: 5
+  
+  # Vector Database
+  vector_store:
+    persist_directory: "./chroma_db"
+    embedding_model: "text-embedding-ada-002"
+    distance_metric: "cosine"
+  
+  # Industries and Keywords
+  industries:
+    defense:
+      keywords:
+        - "defense"
+        - "military"
+        - "aerospace"
+        - "weapons"
+        - "defence"
+        - "arms"
+      tickers:
+        - "LMT"
+        - "RTX"
+        - "BA"
+        - "GD"
+        - "NOC"
+        - "LHX"
+        - "TDG"
+        - "AJRD"
+        - "KTOS"
+    
+    semiconductor:
+      keywords:
+        - "semiconductor"
+        - "chip"
+        - "microprocessor"
+      tickers:
+        - "TSMC"
+        - "AMD"
+        - "NVDA"
+        - "INTC"
+        - "QCOM"
+        - "AVGO"
+        - "MU"
+        - "TXN"
+        - "ADI"
+        - "KLAC"
+        - "AMAT"
+        - "LRCX" 

@@ -1,0 +1,41 @@
+# Application Configuration
+app:
+  # Application Info
+  name: "RAG-Driven Investment Portfolio"
+  version: "1.0.0"
+  description: "AI-powered investment insights from real-time news analysis"
+  
+  # Logging
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: null  # Set to file path if you want file logging
+  
+  # Environment
+  environment: "development"  # development, staging, production
+  
+  # Security
+  security:
+    enable_rate_limiting: false
+    rate_limit_requests: 100
+    rate_limit_window: 60  # seconds
+  
+  # Mobile App
+  mobile:
+    api_base_url: "http://localhost:8000"
+    refresh_interval: 3600  # 1 hour in seconds
+    max_retries: 3
+    timeout: 30  # seconds
+  
+  # Performance
+  performance:
+    max_concurrent_requests: 10
+    request_timeout: 30
+    cache_enabled: false
+    cache_ttl: 300  # 5 minutes
+  
+  # Monitoring
+  monitoring:
+    enable_health_checks: true
+    enable_metrics: false
+    health_check_interval: 60  # seconds 
