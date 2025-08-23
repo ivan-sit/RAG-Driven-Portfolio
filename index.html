@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .ticker {
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .risk-high { border-left-color: #e74c3c; }
+        .risk-medium { border-left-color: #f39c12; }
+        .risk-low { border-left-color: #27ae60; }
+        
+        .key-points {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .key-points li {
+            background: #ecf0f1;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #3498db;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            background: #2980b9;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Investment Portfolio Dashboard</h1>
+            <p>AI-Powered Investment Insights for Defense & Semiconductor Sectors</p>
+        </div>
+        
+        <div class="content">
+            <button class="refresh-btn" onclick="loadData()">🔄 Refresh Data</button>
+            
+            <div id="loading" class="loading">Loading investment data...</div>
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <div id="content" style="display: none;">
+                <div class="section">
+                    <h2>📈 Long-Term Stock Recommendations</h2>
+                    <div id="long-term-stocks" class="grid"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>⚡ Short-Term Options Strategies</h2>
+                    <div id="short-term-options" class="grid"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>📊 Industry Summaries</h2>
+                    <div id="industry-summaries" class="grid"></div>
+                </div>
+                
+                <div class="section">
+                    <h2>📈 System Statistics</h2>
+                    <div id="stats" class="stats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        async function loadData() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const content = document.getElementById('content');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            content.style.display = 'none';
+            
+            try {
+                // Load investment ideas
+                const ideasResponse = await fetch(`${API_BASE}/fetchInvestmentIdeas`);
+                const ideas = await ideasResponse.json();
+                
+                // Load summaries
+                const summariesResponse = await fetch(`${API_BASE}/fetchSummaries`);
+                const summaries = await summariesResponse.json();
+                
+                // Load stats
+                const statsResponse = await fetch(`${API_BASE}/stats`);
+                const stats = await statsResponse.json();
+                
+                displayLongTermStocks(ideas.long_term_stocks);
+                displayShortTermOptions(ideas.short_term_options);
+                displayIndustrySummaries(summaries.summaries);
+                displayStats(stats);
+                
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                
+            } catch (err) {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = `Error loading data: ${err.message}`;
+            }
+        }
+        
+        function displayLongTermStocks(stocks) {
+            const container = document.getElementById('long-term-stocks');
+            container.innerHTML = stocks.map(stock => `
+                <div class="card risk-${stock.risk_level.toLowerCase().includes('high') ? 'high' : 'medium'}">
+                    <div class="ticker">${stock.ticker}</div>
+                    <h3>${stock.name}</h3>
+                    <p><strong>Target Price:</strong> ${stock.target_price}</p>
+                    <p><strong>Risk Level:</strong> ${stock.risk_level}</p>
+                    <p><strong>Timeframe:</strong> ${stock.timeframe}</p>
+                    <p><strong>Reasoning:</strong> ${stock.reasoning}</p>
+                </div>
+            `).join('');
+        }
+        
+        function displayShortTermOptions(options) {
+            const container = document.getElementById('short-term-options');
+            container.innerHTML = options.map(option => `
+                <div class="card risk-${option.risk_level.toLowerCase().includes('high') ? 'high' : 'medium'}">
+                    <div class="ticker">${option.ticker}</div>
+                    <h3>${option.strategy}</h3>
+                    <p><strong>Strike Prices:</strong> ${option.strike_prices}</p>
+                    <p><strong>Expiration:</strong> ${option.expiration}</p>
+                    <p><strong>Risk Level:</strong> ${option.risk_level}</p>
+                    <p><strong>Reasoning:</strong> ${option.reasoning}</p>
+                </div>
+            `).join('');
+        }
+        
+        function displayIndustrySummaries(summaries) {
+            const container = document.getElementById('industry-summaries');
+            container.innerHTML = Object.entries(summaries).map(([industry, data]) => `
+                <div class="card">
+                    <h3>${industry.charAt(0).toUpperCase() + industry.slice(1)} Industry</h3>
+                    <p>${data.summary}</p>
+                    <ul class="key-points">
+                        ${data.key_points.map(point => `<li>${point}</li>`).join('')}
+                    </ul>
+                    <p><strong>Sources:</strong> ${data.sources.join(', ')}</p>
+                </div>
+            `).join('');
+        }
+        
+        function displayStats(stats) {
+            const container = document.getElementById('stats');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.vector_store.documents}</div>
+                    <div class="stat-label">Documents Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.summaries_history_count}</div>
+                    <div class="stat-label">Summary History</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.investment_ideas_history_count}</div>
+                    <div class="stat-label">Investment Ideas History</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.vector_store.collections}</div>
+                    <div class="stat-label">Industry Sectors</div>
+                </div>
+            `;
+        }
+        
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
