@@ -22,3 +22,4 @@ finnhub-python==2.4.18
 newsapi-python==0.2.7
 PyYAML==6.0.1 
 supabase>=2.4.0 
+
