@@ -67,12 +67,24 @@ async def main():
     log_level = server_config.get('log_level', 'info')
     
     logger.info(f"Starting FastAPI server on {host}:{port}")
-    uvicorn.run(
-        app,
-        host=host,
-        port=port,
-        log_level=log_level
-    )
+    
+    # Return server config to be used outside async context
+    return {
+        'app': app,
+        'host': host,
+        'port': port,
+        'log_level': log_level
+    }
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    # Run the async main function
+    server_config = asyncio.run(main())
+    
+    # Start the server outside of async context
+    if server_config:
+        uvicorn.run(
+            server_config['app'],
+            host=server_config['host'],
+            port=server_config['port'],
+            log_level=server_config['log_level']
+        ) 
