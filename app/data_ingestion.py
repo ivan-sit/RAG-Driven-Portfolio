@@ -88,27 +88,35 @@ class DataIngestion:
             
             # Process defense articles
             for article in defense_news.get('articles', []):
-                if self._is_relevant_defense(article['title'] + ' ' + article.get('description', '')):
+                title = article.get('title', '')
+                description = article.get('description', '')
+                content_text = f"{title} {description}".strip()
+                
+                if self._is_relevant_defense(content_text):
                     articles.append(NewsArticle(
-                        title=article['title'],
-                        content=article.get('description', ''),
-                        url=article['url'],
-                        source=article['source']['name'],
-                        published_at=article['publishedAt'],
-                        ticker_symbols=self._extract_tickers(article['title'] + ' ' + article.get('description', '')),
+                        title=title,
+                        content=description,
+                        url=article.get('url', ''),
+                        source=article.get('source', {}).get('name', 'Unknown'),
+                        published_at=article.get('publishedAt', ''),
+                        ticker_symbols=self._extract_tickers(content_text),
                         industry='defense'
                     ))
             
             # Process semiconductor articles
             for article in semiconductor_news.get('articles', []):
-                if self._is_relevant_semiconductor(article['title'] + ' ' + article.get('description', '')):
+                title = article.get('title', '')
+                description = article.get('description', '')
+                content_text = f"{title} {description}".strip()
+                
+                if self._is_relevant_semiconductor(content_text):
                     articles.append(NewsArticle(
-                        title=article['title'],
-                        content=article.get('description', ''),
-                        url=article['url'],
-                        source=article['source']['name'],
-                        published_at=article['publishedAt'],
-                        ticker_symbols=self._extract_tickers(article['title'] + ' ' + article.get('description', '')),
+                        title=title,
+                        content=description,
+                        url=article.get('url', ''),
+                        source=article.get('source', {}).get('name', 'Unknown'),
+                        published_at=article.get('publishedAt', ''),
+                        ticker_symbols=self._extract_tickers(content_text),
                         industry='semiconductor'
                     ))
                     
@@ -137,17 +145,22 @@ class DataIngestion:
                 
                 feed = feedparser.parse(feed_url)
                 for entry in feed.entries[:max_articles]:
-                    content = self._extract_content_from_url(entry.link)
+                    title = getattr(entry, 'title', '')
+                    link = getattr(entry, 'link', '')
+                    published = getattr(entry, 'published', '')
+                    
+                    content = self._extract_content_from_url(link)
                     if content:
-                        industry = self._classify_industry(entry.title + ' ' + content)
+                        content_text = f"{title} {content}".strip()
+                        industry = self._classify_industry(content_text)
                         if industry:
                             articles.append(NewsArticle(
-                                title=entry.title,
+                                title=title,
                                 content=content,
-                                url=entry.link,
+                                url=link,
                                 source=feed_name,
-                                published_at=entry.published,
-                                ticker_symbols=self._extract_tickers(entry.title + ' ' + content),
+                                published_at=published,
+                                ticker_symbols=self._extract_tickers(content_text),
                                 industry=industry
                             ))
             except Exception as e:
@@ -159,11 +172,14 @@ class DataIngestion:
         """Extract article content from URL"""
         try:
             article = Article(url)
+            article.config.browser_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             article.download()
             article.parse()
-            return article.text
+            return article.text if article.text else ""
         except Exception as e:
-            logger.error(f"Error extracting content from {url}: {e}")
+            # Don't log 403 errors as they're expected for some sites
+            if "403" not in str(e):
+                logger.error(f"Error extracting content from {url}: {e}")
             return ""
 
     def _classify_industry(self, text: str) -> str:
@@ -177,7 +193,7 @@ class DataIngestion:
             return 'defense'
         elif semiconductor_score > 0:
             return 'semiconductor'
-        return None
+        return ''
 
     def _is_relevant_defense(self, text: str) -> bool:
         """Check if text is relevant to defense industry"""
@@ -191,6 +207,9 @@ class DataIngestion:
 
     def _extract_tickers(self, text: str) -> List[str]:
         """Extract stock ticker symbols from text"""
+        if not text:
+            return []
+            
         # Common ticker patterns
         ticker_pattern = r'\b[A-Z]{1,5}\b'
         tickers = re.findall(ticker_pattern, text)
