@@ -1,6 +1,6 @@
 import os
 import hashlib
-from supabase import create_client, Client
+# from supabase import create_client, Client
 from typing import Optional, Dict, Any, List
 from dotenv import load_dotenv
 
@@ -9,7 +9,9 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+# Temporarily comment out to avoid dependency issues
+# supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+supabase = None
 
 # --- Hashing helpers ---
 def hash_article(url: str, title: str, published_at: str) -> str:
