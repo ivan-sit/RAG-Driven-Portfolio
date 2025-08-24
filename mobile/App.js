@@ -450,6 +450,4 @@ const styles = StyleSheet.create({
   },
 });
 
-registerRootComponent(App);
-
 export default App;
