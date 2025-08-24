@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { registerRootComponent } from 'expo';
 import {
   SafeAreaView,
   ScrollView,
@@ -449,4 +450,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App; 
+registerRootComponent(App);
+
+export default App;
