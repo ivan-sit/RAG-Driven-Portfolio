@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "rag-portfolio-mobile",
+    "slug": "rag-portfolio-mobile",
+    "version": "1.0.0",
+    "entryPoint": "./App.js"
+  }
+}
