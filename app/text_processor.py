@@ -125,9 +125,9 @@ class TextProcessor:
             chunk_tickers = self.extract_tickers_from_text(chunk)
             if chunk_tickers:
                 metadata['chunk_tickers'] = chunk_tickers
-            # Insert chunk into Supabase
+            # Insert chunk into Supabase, linking to the article if an ID is available
             upsert_chunk({
-                "article_id": None,  # Optionally link to article if you fetch it
+                "article_id": getattr(article, "id", None),
                 "chunk_index": i,
                 "content": chunk,
                 "chunk_hash": chunk_hash,

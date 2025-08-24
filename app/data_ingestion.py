@@ -231,8 +231,8 @@ class DataIngestion:
         for article in unique_articles:
             article_hash = hash_article(article.url, article.title, article.published_at)
             if not get_article_by_hash(article_hash):
-                # Insert into Supabase
-                upsert_article({
+                # Insert into Supabase and capture returned row to obtain article ID
+                inserted = upsert_article({
                     "url": article.url,
                     "title": article.title,
                     "published_at": article.published_at,
@@ -240,6 +240,9 @@ class DataIngestion:
                     "industry": article.industry,
                     "article_hash": article_hash
                 })
+                # Store the Supabase-generated ID on the article for linking chunks
+                if inserted and inserted.get("id") is not None:
+                    article.id = inserted["id"]
                 new_articles.append(article)
             else:
                 logger.info(f"Article already in Supabase: {article.url}")

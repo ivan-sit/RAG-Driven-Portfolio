@@ -37,6 +37,8 @@ class InvestmentIdeasResponse(BaseModel):
     generated_at: str
 
 class NewsArticle(BaseModel):
+    """Representation of a news article fetched from external sources or Supabase."""
+    id: Optional[int] = None
     title: str
     content: str
     url: str
