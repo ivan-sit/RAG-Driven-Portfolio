@@ -30,6 +30,11 @@ def upsert_article(article: Dict[str, Any]) -> Dict[str, Any]:
     res = supabase.table("articles").upsert(article).execute()
     return res.data[0] if res.data else None
 
+def article_has_chunks(article_id: int) -> bool:
+    """Check if any chunks exist for the given article ID."""
+    res = supabase.table("chunks").select("id").eq("article_id", article_id).limit(1).execute()
+    return bool(res.data)
+
 # --- Chunk helpers ---
 def get_chunk_by_hash(chunk_hash: str) -> Optional[Dict[str, Any]]:
     res = supabase.table("chunks").select("*").eq("chunk_hash", chunk_hash).execute()
