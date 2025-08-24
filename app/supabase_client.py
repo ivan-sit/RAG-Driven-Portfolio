@@ -88,8 +88,15 @@ def get_chunks_for_ticker(ticker: str, since: str = None) -> List[Dict[str, Any]
 	return res.data or []
 
 def get_articles_for_day(day: str) -> List[Dict[str, Any]]:
-	# day: 'YYYY-MM-DD'
-	if not supabase:
-		return []
-	res = supabase.table("articles").select("*").gte("published_at", f"{day}T00:00:00Z").lt("published_at", f"{day}T23:59:59Z").execute()
-	return res.data or [] 
+    # day: 'YYYY-MM-DD'
+    if not supabase:
+        return []
+    res = supabase.table("articles").select("*").gte("published_at", f"{day}T00:00:00Z").lt("published_at", f"{day}T23:59:59Z").execute()
+    return res.data or []
+
+def article_has_chunks(article_id: int) -> bool:
+    """Check if an article already has chunks stored"""
+    if not supabase:
+        return False
+    res = supabase.table("chunks").select("id").eq("article_id", article_id).limit(1).execute()
+    return bool(res.data)
