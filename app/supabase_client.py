@@ -22,6 +22,7 @@ except Exception as e:
 
 # --- Hashing helpers ---
 def hash_article(url: str, title: str, published_at: str) -> str:
+	# Use the same hash computation as the chunks
 	s = f"{url}|{title}|{published_at}"
 	return hashlib.sha256(s.encode()).hexdigest()
 
@@ -55,8 +56,25 @@ def get_chunk_by_hash(chunk_hash: str) -> Optional[Dict[str, Any]]:
 def upsert_chunk(chunk: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 	if not supabase:
 		return None
-	res = supabase.table("chunks").upsert(chunk).execute()
-	return res.data[0] if res.data else None
+	
+	# If only chunk_hash and embedding are provided, do a partial update
+	if len(chunk) == 2 and 'chunk_hash' in chunk and 'embedding' in chunk:
+		try:
+			res = supabase.table("chunks").update({
+				"embedding": chunk["embedding"]
+			}).eq("chunk_hash", chunk["chunk_hash"]).execute()
+			return res.data[0] if res.data else None
+		except Exception as e:
+			logger.error(f"Error updating chunk embedding: {e}")
+			return None
+	
+	# Otherwise, do a full upsert
+	try:
+		res = supabase.table("chunks").upsert(chunk).execute()
+		return res.data[0] if res.data else None
+	except Exception as e:
+		logger.error(f"Error upserting chunk: {e}")
+		return None
 
 # --- Query helpers for analytics/history ---
 def get_chunks_for_ticker(ticker: str, since: str = None) -> List[Dict[str, Any]]:

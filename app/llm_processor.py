@@ -17,7 +17,18 @@ class LLMProcessor:
         self.rag_config = config_manager.get_rag_config().get('rag', {})
         self.api_config = config_manager.get_api_config().get('api', {})
         
-        self.client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        # Initialize OpenAI client with error handling
+        try:
+            api_key = os.getenv('OPENAI_API_KEY')
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY not found in environment variables")
+            
+            self.client = OpenAI(api_key=api_key)
+            logger.info("OpenAI client initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI client: {e}")
+            self.client = None
+        
         self.model = self.rag_config.get('model', 'gpt-4-turbo-preview')
         self.max_tokens = self.rag_config.get('max_tokens', 300)
         self.temperature = self.rag_config.get('temperature', 0.7)
@@ -89,6 +100,9 @@ News content:
 Provide a clear, professional summary that would be useful for investors:"""
         
         try:
+            if not self.client:
+                raise ValueError("OpenAI client not initialized")
+                
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
@@ -244,6 +258,9 @@ Format your response as JSON:
 }}"""
         
         try:
+            if not self.client:
+                raise ValueError("OpenAI client not initialized")
+                
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],

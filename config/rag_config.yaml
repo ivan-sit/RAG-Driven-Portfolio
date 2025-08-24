@@ -19,7 +19,7 @@ rag:
   
   # Vector Database
   vector_store:
-    persist_directory: "./chroma_db"
+    persist_directory: "./qdrant_db"
     embedding_model: "text-embedding-ada-002"
     distance_metric: "cosine"
   

@@ -116,7 +116,7 @@ class TextProcessor:
                 'url': article.url,
                 'source': article.source,
                 'published_at': article.published_at,
-                'ticker_symbols': article.ticker_symbols,
+                'ticker_symbols': ','.join(article.ticker_symbols) if article.ticker_symbols else '',
                 'industry': article.industry,
                 'chunk_index': i,
                 'total_chunks': len(chunks)
@@ -124,10 +124,10 @@ class TextProcessor:
             # Add any additional tickers found in this chunk
             chunk_tickers = self.extract_tickers_from_text(chunk)
             if chunk_tickers:
-                metadata['chunk_tickers'] = chunk_tickers
+                metadata['chunk_tickers'] = ','.join(chunk_tickers)
             # Insert chunk into Supabase
             upsert_chunk({
-                "article_id": None,  # Optionally link to article if you fetch it
+                "article_id": article.id,  # Link to the article using the correct foreign key
                 "chunk_index": i,
                 "content": chunk,
                 "chunk_hash": chunk_hash,
