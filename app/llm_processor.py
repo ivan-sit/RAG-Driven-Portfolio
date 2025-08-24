@@ -59,6 +59,7 @@ class LLMProcessor:
 
     def generate_industry_summary(self, chunks: List[Dict[str, Any]], industry: str) -> IndustrySummary:
         """Generate a summary for a specific industry"""
+        # print(f"Generating summary for {industry} : {chunks}")
         if not chunks:
             return IndustrySummary(
                 summary_text="No recent news available for this industry.",
