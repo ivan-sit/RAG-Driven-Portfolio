@@ -18,7 +18,7 @@ import logging
 from .models import NewsArticle
 from .config_manager import config_manager
 from .supabase_client import (
-	hash_article, hash_chunk, get_article_by_hash, upsert_article, get_chunk_by_hash, upsert_chunk
+        hash_article, hash_chunk, get_article_by_hash, upsert_article, get_chunk_by_hash, upsert_chunk, article_has_chunks
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -257,32 +257,39 @@ class DataIngestion:
 		logger.info(f"Fetched {len(unique_articles)} unique articles")
 		
 		# --- Supabase persistent cache: filter out already-processed articles ---
-		new_articles = []
-		for article in unique_articles:
-			article_hash = hash_article(article.url, article.title, article.published_at)
-			if not get_article_by_hash(article_hash):
-				# Insert into Supabase
-				upsert_article({
-					"url": article.url,
-					"title": article.title,
-					"published_at": article.published_at,
-					"source": article.source,
-					"industry": article.industry,
-					"article_hash": article_hash
-				})
-				new_articles.append(article)
-			else:
-				logger.info(f"Article already in Supabase: {article.url}")
-		
-		logger.info(f"{len(new_articles)} new articles to process (not in Supabase)")
-		return new_articles
+                new_articles = []
+                for article in unique_articles:
+                        article_hash = hash_article(article.url, article.title, article.published_at)
+                        existing = get_article_by_hash(article_hash)
+                        if not existing:
+                                stored = upsert_article({
+                                        "url": article.url,
+                                        "title": article.title,
+                                        "published_at": article.published_at,
+                                        "source": article.source,
+                                        "industry": article.industry,
+                                        "article_hash": article_hash
+                                })
+                                if stored:
+                                        article.id = stored.get("id")
+                                new_articles.append(article)
+                        else:
+                                article.id = existing.get("id")
+                                if article.id and not article_has_chunks(article.id):
+                                        logger.info(f"Article in Supabase without chunks: {article.url}")
+                                        new_articles.append(article)
+                                else:
+                                        logger.info(f"Article already in Supabase: {article.url}")
 
-	def clean_text(self, text: str) -> str:
-		"""Clean and standardize text"""
-		# Remove extra whitespace
-		text = re.sub(r'\s+', ' ', text)
-		# Remove special characters but keep basic punctuation
-		text = re.sub(r'[^\w\s\.\,\!\?\-\:\;]', '', text)
-		# Standardize to lowercase
-		text = text.lower().strip()
-		return text 
+                logger.info(f"{len(new_articles)} new articles to process (including reprocessing)")
+                return new_articles
+
+        def clean_text(self, text: str) -> str:
+                """Clean and standardize text"""
+                # Remove extra whitespace
+                text = re.sub(r'\s+', ' ', text)
+                # Remove special characters but keep basic punctuation
+                text = re.sub(r'[^\w\s\.\,\!\?\-\:\;]', '', text)
+                # Standardize to lowercase
+                text = text.lower().strip()
+                return text

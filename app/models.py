@@ -37,6 +37,7 @@ class InvestmentIdeasResponse(BaseModel):
     generated_at: str
 
 class NewsArticle(BaseModel):
+    id: Optional[int] = None
     title: str
     content: str
     url: str
@@ -48,4 +49,4 @@ class NewsArticle(BaseModel):
 class ProcessedChunk(BaseModel):
     content: str
     metadata: dict
-    embedding: Optional[List[float]] = None 
+    embedding: Optional[List[float]] = None

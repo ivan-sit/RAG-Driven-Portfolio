@@ -126,14 +126,16 @@ class TextProcessor:
             if chunk_tickers:
                 metadata['chunk_tickers'] = ','.join(chunk_tickers)
             # Insert chunk into Supabase
-            upsert_chunk({
-                "article_id": article.id,  # Link to the article using the correct foreign key
+            chunk_record = {
                 "chunk_index": i,
                 "content": chunk,
                 "chunk_hash": chunk_hash,
                 "embedding": None,  # To be filled after embedding
                 "metadata": metadata
-            })
+            }
+            if article.id is not None:
+                chunk_record["article_id"] = article.id
+            upsert_chunk(chunk_record)
             processed_chunks.append(ProcessedChunk(
                 content=chunk,
                 metadata=metadata
@@ -180,5 +182,6 @@ class TextProcessor:
                 logger.error(f"Error parsing date for chunk: {e}")
                 # Include chunks with date parsing errors
                 filtered_chunks.append(chunk)
-        
-        return filtered_chunks 
+
+        return filtered_chunks
+
